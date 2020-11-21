@@ -29,11 +29,39 @@ public class TernaryHeapMinPriorityQueue {
     // TODO implement: possibly insert other private fields that may be needed
     // for implementation
 
+
     /**
      * Create an empty queue.
      */
     public TernaryHeapMinPriorityQueue() {
         this.heap = new ArrayList<PriorityQueueElement>();
+    }
+
+
+    //find leaves/parents
+    private int leftIndex(int h){
+        return (3 * h) + 1;
+    }
+
+    private int centralIndex(int h){
+        return (3 * h) + 2;
+    }
+
+    private int rightIndex(int h){
+        return (3 * h) + 3;
+    }
+
+    private int getParent(int h){
+        return (h - 1) / 3;
+    }
+
+    /**
+     * Determina se lo heap è vuoto.
+     *
+     * @return true se lo heap è vuoto.
+     */
+    public boolean isEmpty() {
+        return this.heap.isEmpty();
     }
 
     /**
@@ -70,8 +98,9 @@ public class TernaryHeapMinPriorityQueue {
      *                                    if this min-priority queue is empty
      */
     public PriorityQueueElement minimum() {
-        // TODO implement
-        return null;
+        if(heap.isEmpty())
+            throw new NoSuchElementException();
+        return heap.get(0);
     }
 
     /**
@@ -83,10 +112,19 @@ public class TernaryHeapMinPriorityQueue {
      *                                    if this min-priority queue is empty
      */
     public PriorityQueueElement extractMinimum() {
-        // TODO implement
-        return null;
+        swap(0,heap.size( )-1);
+        PriorityQueueElement max=heap.get(size()-1);
+        heap.remove(size()-1);
+        heapify(0);
+        return max;
     }
 
+    private void swap ( int root, int index){
+        PriorityQueueElement iElement=heap.get(index);
+        PriorityQueueElement rElement=heap.get(root);
+        heap.set(root,iElement);
+        heap.set(index,rElement);
+    }
     /**
      * Decrease the priority associated to an element of this min-priority
      * queue. The position of the element in the ternary heap must be changed
@@ -112,6 +150,31 @@ public class TernaryHeapMinPriorityQueue {
         // TODO implement
     }
 
+    private void heapify(int h){
+        int min = h;
+        int left = leftIndex(h);
+        int right = rightIndex(h);
+        int center = centralIndex(h);
+
+        // se elemento di left index è minore del root
+        if (left < heap.size() && heap.get(left).getPriority() < (heap.get(min).getPriority()))
+            min = leftIndex(h);//lo metto su min
+
+
+        if (right < heap.size() && heap.get(right).getPriority() < (heap.get(min).getPriority()))
+            min = rightIndex(h);//metto su min
+
+        if (center < heap.size() && heap.get(center).getPriority() < heap.get(min).getPriority())
+            min= centralIndex(h);
+
+        // se largest non ha root
+        if (min != h) {
+            swap(h,min);
+            // ricorsione
+            heapify(min);
+        }
+    }
+    }
     /**
      * Erase all the elements from this min-priority queue. After this operation
      * this min-priority queue is empty.
@@ -119,8 +182,6 @@ public class TernaryHeapMinPriorityQueue {
     public void clear() {
         this.heap.clear();
     }
-
-    // TODO implement: possibly add private methods for implementation purposes
 
     /*
      * This method is only for JUnit testing purposes.

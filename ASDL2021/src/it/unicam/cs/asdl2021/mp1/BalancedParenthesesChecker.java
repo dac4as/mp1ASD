@@ -1,5 +1,7 @@
 package it.unicam.cs.asdl2021.mp1;
 
+import java.util.Collection;
+
 /**
  * An object of this class is an actor that uses an ASDL2021Deque<Character> as
  * a Stack in order to check that a sequence containing the following
@@ -15,8 +17,8 @@ package it.unicam.cs.asdl2021.mp1;
  * NOT a string of balanced parentheses - "( ( \n [(P)] \t ))" is NOT a string
  * of balanced parentheses
  * 
- * @author Template: Luca Tesei, Implementation: INSERIRE NOME E COGNOME DELLO
- *         STUDENTE - INSERIRE ANCHE L'EMAIL xxxx@studenti.unicam.it
+ * @author Template: Luca Tesei, Implementation: Niccolò Cuartas -
+ * niccolo.cuartas@studenti.unicam.it
  *
  */
 public class BalancedParenthesesChecker {
@@ -47,12 +49,47 @@ public class BalancedParenthesesChecker {
      *                                      and newline '\n'
      */
     public boolean check(String s) {
-        // TODO implement - NOTE: the stack must be cleared first every time
-        // this method is called. Then it has to be used to perform the check.
         if(!stack.isEmpty())
             stack.clear();
+        char[] toAdd=s.toCharArray();
+        for(char c:toAdd)
+        {
+            if(c!='(' && c!= ')' && c!= '[' && c!= ']' && c!= '{' && c!= '}' && c!=' ' && c!='\n' && c!='\t')//lancia eccezione se non sono caratteri previsti
+                throw new IllegalArgumentException();
+            if(c=='(' || c== '[' || c== '{')//se sono parentesi di apertura, pusho dall'inizio
+            {
+                stack.push(c);
+                continue;
+            }
+            if(stack.isEmpty())
+                return false;
 
-        //stack.addAll(s);
+            char check;
+
+            switch (c)
+            {
+                case ')':
+                    check=stack.pop();
+                    if(check=='{' || check=='[')
+                        return false;
+                    break;
+
+                case '}':
+                    check = stack.pop();
+                    if (check == '(' || check == '[')
+                        return false;
+                    break;
+
+                case ']':
+                    check = stack.pop();
+                    if (check == '(' || check == '{')
+                        return false;
+                    break;
+            }
+            return stack.isEmpty();
+        }
+
+
         return false;
     }
 
