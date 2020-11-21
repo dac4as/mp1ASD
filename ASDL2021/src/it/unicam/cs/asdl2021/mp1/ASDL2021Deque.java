@@ -376,15 +376,11 @@ public class ASDL2021Deque<E> implements Deque<E> {
             if(index.item.equals(o))
             {
                 this.removeFirst();
-                nMod++;
-                size--;
                 return true;
             }
             if(this.last.item.equals(o))
             {
                 this.removeLast();
-                nMod++;
-                size--;
                 return true;
             }//dopo aver controllato che gli estremi non contengano l'oggetto, controllo il resto della lista
             while (!index.item.equals(o)) {

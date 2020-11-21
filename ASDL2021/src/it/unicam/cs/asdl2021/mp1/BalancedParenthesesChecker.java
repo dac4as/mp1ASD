@@ -49,6 +49,10 @@ public class BalancedParenthesesChecker {
     public boolean check(String s) {
         // TODO implement - NOTE: the stack must be cleared first every time
         // this method is called. Then it has to be used to perform the check.
+        if(!stack.isEmpty())
+            stack.clear();
+
+        //stack.addAll(s);
         return false;
     }
 
