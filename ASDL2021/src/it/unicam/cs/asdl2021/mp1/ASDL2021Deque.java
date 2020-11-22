@@ -66,13 +66,13 @@ public class ASDL2021Deque<E> implements Deque<E> {
 
     @Override
     public boolean isEmpty() {
-        return this.first==null;
-        //return this.size==0;
+        //return this.first==null;
+        return this.size==0;
     }
 
     @Override
     public Object[] toArray() {
-        Object[] array = new Object[size+1];
+        Object[] array = new Object[size];
         Node<E> node = this.first;
         int i=0;
 
@@ -80,8 +80,9 @@ public class ASDL2021Deque<E> implements Deque<E> {
         {
             array[i]=node;
             i++;
+            node=node.next;
         }
-        return null;
+        return array;
     }
 
     @Override
@@ -155,6 +156,7 @@ public class ASDL2021Deque<E> implements Deque<E> {
     @Override
     public void clear() {
         this.first=null;
+        this.last=null;
         nMod++;
         size=0;
     }
@@ -163,45 +165,51 @@ public class ASDL2021Deque<E> implements Deque<E> {
     public void addFirst(E e) {
         if(e==null)
             throw new NullPointerException();
-        Node<E> oldFirst=this.first;
-        Node<E> newFirst= new Node<>(null,e,this.first);
-        oldFirst.prev=(newFirst);
-        nMod++;
-        size++;
+        if(isEmpty()) {
+            this.last = this.first = new Node<>(null, e, null);
+            nMod++;
+            size = 1;
+        }
+        else {
+//          Node<E> oldFirst = this.first;
+            Node<E> newFirst = new Node<>(null, e, this.first);
+            this.first.prev = (newFirst);
+            first=newFirst;
+            nMod++;
+            size++;
+        }
     }
 
     @Override
     public void addLast(E e) {
         if(e==null)
             throw new NullPointerException();
-        Node<E> oldLast=this.last;//variabile di comodo per contenere l'ultimo nodo corrente che andrà poi modificato
-        Node<E> newLast=new Node<>(this.last,e,null);//creo nuovo nodo in fondo alla lista(con riferimento next null quindi)
-        oldLast.next=(newLast);//la vecchia coda fa riferimento alla nuova appena aggiunta
+        //Node<E> oldLast=this.last;//variabile di comodo per contenere l'ultimo nodo corrente che andrà poi modificato
+        Node<E> newLast=new Node<>(null,e,null);//creo nuovo nodo in fondo alla lista(con riferimento next null quindi)
+
+        if(isEmpty())
+        {
+            first=last=newLast;
+        }
+        else
+        {
+            last.next = (newLast);//penultimo nodo
+            newLast.prev=last;
+            last = newLast;//il nuovo last è l'ultimo nodo della lista
+        }
         nMod++;
         size++;
     }
 
     @Override
     public boolean offerFirst(E e) {
-        if(e==null)
-            throw new NullPointerException();
-        Node<E> oldFirst=this.first;
-        Node<E> newFirst= new Node<>(null,e,this.first);
-        oldFirst.prev=(newFirst);
-        nMod++;
-        size++;
+        addFirst(e);
         return true;
     }
 
     @Override
     public boolean offerLast(E e) {
-        if(e==null)
-            throw new NullPointerException();
-        Node<E> oldLast=this.last;
-        Node<E> newLast=new Node<>(this.last,e,null);
-        oldLast.next=(newLast);
-        nMod++;
-        size++;
+        addLast(e);
         return true;
     }
 
@@ -209,46 +217,48 @@ public class ASDL2021Deque<E> implements Deque<E> {
     public E removeFirst() {
         if(isEmpty())
             throw new NoSuchElementException();
-        Node<E> toReturn=this.first;
-        Node<E> afterHead = this.first.next;
-        afterHead.prev=null;//annullo il riferimento al primo nodo(afterHead diventa la nuova head)
-        nMod++;
-        size--;
-        return toReturn.item;
+        return pollFirst();
     }
 
     @Override
     public E removeLast() {
         if(isEmpty())
             throw new NoSuchElementException();
-        Node<E> toReturn=this.last;
-        Node<E> beforeTail=this.last.prev;
-        beforeTail.next=null;
-        nMod++;
-        size--;
-        return toReturn.item;
+        return pollLast();
     }
 
     @Override
     public E pollFirst() {
         if(isEmpty()) return null;
-        Node<E> toReturn=this.first;
-        Node<E> afterHead = this.first.next;
-        afterHead.prev=null;
+        E item=first.item;
+        if(size==1)
+        {
+            clear();
+            return item;
+        }
+
+        first=first.next;
+        first.prev=null;
         nMod++;
         size--;
-        return toReturn.item;
+        return item;
     }
 
     @Override
     public E pollLast() {
         if(isEmpty()) return null;
-        Node<E> toReturn=this.last;
-        Node<E> beforeTail=this.last.prev;
-        beforeTail.next=null;
+        E item=last.item;
+        if(size==1)
+        {
+            clear();
+            return item;
+        }
+
+        last=last.prev;
+        last.next=null;
         nMod++;
         size--;
-        return toReturn.item;
+        return item;
     }
 
     @Override
@@ -265,11 +275,15 @@ public class ASDL2021Deque<E> implements Deque<E> {
 
     @Override
     public E peekFirst() {
+        if(first==null)
+            return null;
         return this.first.item;
     }
 
     @Override
     public E peekLast() {
+        if(last==null)
+            return null;
         return this.last.item;
     }
 
@@ -287,83 +301,46 @@ public class ASDL2021Deque<E> implements Deque<E> {
 
     @Override
     public boolean add(E e) {
-        if(e==null)
-            throw new NullPointerException();
-        Node<E> oldLast=this.last;//variabile di comodo per contenere l'ultimo nodo corrente che andrà poi modificato
-        Node<E> newLast=new Node<>(this.last,e,null);//creo nuovo nodo in fondo alla lista(con riferimento next null quindi)
-        oldLast.next=(newLast);//la vecchia coda fa riferimento alla nuova appena aggiunta
-        size++;
-        nMod++;
+        addLast(e);
         return true;
     }
 
     @Override
     public boolean offer(E e) {
-        if(e==null)
-            throw new NullPointerException();
-        Node<E> oldLast=this.last;
-        Node<E> newLast=new Node<>(this.last,e,null);
-        oldLast.next=(newLast);
-        size++;
-        nMod++;
-        return true;
+        return offerLast(e);
     }
 
     @Override
     public E remove() {
         if(isEmpty())
             throw new NoSuchElementException();
-        Node<E> toReturn=this.first;
-        Node<E> afterHead = this.first.next;
-        afterHead.prev=null;//annullo il riferimento al primo nodo(afterHead diventa la nuova head)
-        size--;
-        nMod++;
-        return toReturn.item;
+        return removeFirst();
     }
 
     @Override
     public E poll() {
-        if(isEmpty()) return null;
-        Node<E> toReturn=this.first;
-        Node<E> afterHead = this.first.next;
-        afterHead.prev=null;
-        size--;
-        nMod++;
-        return toReturn.item;
+        return pollFirst();
     }
 
     @Override
     public E element() {
         if(isEmpty()) throw new NoSuchElementException();
-        return this.first.item;
+        return getFirst();
     }
 
     @Override
     public E peek() {
-        return this.first.item;
+        return peekFirst();
     }
 
     @Override
     public void push(E e) {
-        if(e==null)
-            throw new NullPointerException();
-        Node<E> oldFirst=this.first;
-        Node<E> newFirst= new Node<>(null,e,this.first);
-        oldFirst.prev=(newFirst);
-        nMod++;
-        size++;
+        addFirst(e);
     }
 
     @Override
     public E pop() {
-        if(isEmpty())
-            throw new NoSuchElementException();
-        Node<E> toReturn=this.first;
-        Node<E> afterHead = this.first.next;
-        afterHead.prev=null;//annullo il riferimento al primo nodo(afterHead diventa la nuova head)
-        nMod++;
-        size--;
-        return toReturn.item;
+        return removeFirst();
     }
 
     @Override
@@ -463,6 +440,7 @@ public class ASDL2021Deque<E> implements Deque<E> {
         }
 
         public boolean hasNext() {
+            if (isEmpty()) return false;
             return lastReturned.next!=null;
         }
 

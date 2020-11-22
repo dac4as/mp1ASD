@@ -26,10 +26,6 @@ public class TernaryHeapMinPriorityQueue {
      */
     private ArrayList<PriorityQueueElement> heap;
 
-    // TODO implement: possibly insert other private fields that may be needed
-    // for implementation
-
-
     /**
      * Create an empty queue.
      */
@@ -85,7 +81,11 @@ public class TernaryHeapMinPriorityQueue {
      *                                  if the element passed is null
      */
     public void insert(PriorityQueueElement element) {
-        // TODO implement
+        if(element==null)
+            throw new NullPointerException();
+        heap.add(element);
+        element.setHandle(heap.indexOf(element));
+        heapify(getParent(element.getHandle()));
     }
 
     /**
@@ -112,18 +112,28 @@ public class TernaryHeapMinPriorityQueue {
      *                                    if this min-priority queue is empty
      */
     public PriorityQueueElement extractMinimum() {
-        swap(0,heap.size( )-1);
-        PriorityQueueElement max=heap.get(size()-1);
-        heap.remove(size()-1);
-        heapify(0);
-        return max;
+        if(isEmpty())
+            throw new NoSuchElementException();
+        PriorityQueueElement min=minimum();//salvo il nodo da restituire
+        swap(0,heap.size()-1);//scambio il primo elemento(root=0=minumum()) con ultimo infondo
+        heap.remove(size()-1);//cancello l'ultimo
+        heapify(0);//e chiamo heapify() sull'ultimo, dato che deve essere rioprdinato
+        return min;
     }
 
     private void swap ( int root, int index){
         PriorityQueueElement iElement=heap.get(index);
+        int iIndex=heap.indexOf(iElement);
         PriorityQueueElement rElement=heap.get(root);
+        int rIndex=heap.indexOf(rElement);
+
+        iElement.setHandle(rIndex);
+        rElement.setHandle(iIndex);
+
         heap.set(root,iElement);
         heap.set(index,rElement);
+
+
     }
     /**
      * Decrease the priority associated to an element of this min-priority
@@ -147,7 +157,13 @@ public class TernaryHeapMinPriorityQueue {
      */
     public void decreasePriority(PriorityQueueElement element,
             double newPriority) {
-        // TODO implement
+        if(element.getPriority()<newPriority)
+            throw new IllegalArgumentException();
+        if(heap.get(element.getHandle())==null)
+            throw new NoSuchElementException();
+
+        element.setPriority(newPriority);
+        heapify(getParent(element.getHandle()));
     }
 
     private void heapify(int h){
@@ -165,16 +181,16 @@ public class TernaryHeapMinPriorityQueue {
             min = rightIndex(h);//metto su min
 
         if (center < heap.size() && heap.get(center).getPriority() < heap.get(min).getPriority())
-            min= centralIndex(h);
+            min = centralIndex(h);
 
-        // se largest non ha root
+        // se min è diverso da root
         if (min != h) {
             swap(h,min);
             // ricorsione
             heapify(min);
         }
     }
-    }
+
     /**
      * Erase all the elements from this min-priority queue. After this operation
      * this min-priority queue is empty.
