@@ -442,17 +442,25 @@ public class ASDL2021Deque<E> implements Deque<E> {
         public boolean hasNext() {
             if(isEmpty())
                 return false;
-            if(lastReturned.next!=null)
+            if(last!=null && lastReturned!=last)
                 return true;
-            else throw new NullPointerException();
+            return false;
         }
 
         public E next() {
+            if(lastReturned==null && last!=null) //se è null e la coda non è vuota, (re)inizializzo lastReturned (partendo dalla testa)
+            {
+                lastReturned = first;
+                return lastReturned.item;
+            }
             if(!hasNext())
                 throw new NoSuchElementException();
             if(numeroModificheAtteso!=nMod)
                 throw new ConcurrentModificationException();
-            return lastReturned.next.item;
+            if(lastReturned==null)
+                throw new NoSuchElementException();
+            lastReturned=lastReturned.next;
+            return lastReturned.item;
         }
     }
 
@@ -481,19 +489,26 @@ public class ASDL2021Deque<E> implements Deque<E> {
         public boolean hasNext() {
             if(isEmpty())
                 return false;
-            if(lastReturned.next!=null)
+            if(first!=null && lastReturned.next!=first)
                 return true;
-            else throw new NullPointerException();
+            return false;
         }
 
         public E next() {
+            if(lastReturned==null && first!=null) //se è null e la testa non è vuota, (re)inizializzo lastReturned (partendo dalla coda)
+            {
+                lastReturned = last;
+                return lastReturned.item;
+            }
             if(!hasNext())
-               throw new NoSuchElementException();
+                throw new NoSuchElementException();
             if(numeroModificheAtteso!=nMod)
                 throw new ConcurrentModificationException();
-            return lastReturned.prev.item;
+            if(lastReturned==null)
+                throw new NoSuchElementException();
+            lastReturned=lastReturned.prev;
+            return lastReturned.item;
         }
-
     }
 
     /*

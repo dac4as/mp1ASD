@@ -49,8 +49,10 @@ public class BalancedParenthesesChecker {
      *                                      and newline '\n'
      */
     public boolean check(String s) {
+        ASDL2021Deque<Character> toIgnore = new ASDL2021Deque<>();
         if(!stack.isEmpty())
             stack.clear();
+
         char[] toAdd=s.toCharArray();
         for(char c:toAdd)
         {
@@ -59,10 +61,18 @@ public class BalancedParenthesesChecker {
             if(c=='(' || c== '[' || c== '{')//se sono parentesi di apertura, pusho dall'inizio
             {
                 stack.push(c);
-                continue;
+                //continue;
             }
-            if(stack.isEmpty())
+
+            else
+            {
+                toIgnore.push(c);//ignoro i caratteri accettati ma non considerati, filtro la stringa
+            }
+
+            if(stack.isEmpty() && toIgnore.isEmpty())
                 return false;
+            //if(stack.getFirst()==')'||stack.getFirst()==']'||stack.getFirst()=='}')//una stringa bilanciata non può iniziare così
+                //return false;
 
             char check;
 
@@ -86,11 +96,9 @@ public class BalancedParenthesesChecker {
                         return false;
                     break;
             }
-            return stack.isEmpty();
+
         }
-
-
-        return false;
+        return stack.isEmpty();
     }
 
 }

@@ -84,8 +84,14 @@ public class TernaryHeapMinPriorityQueue {
         if(element==null)
             throw new NullPointerException();
         heap.add(element);
-        element.setHandle(heap.indexOf(element));
-        heapify(getParent(element.getHandle()));
+        element.setHandle(size()-1);
+        int handleElement=element.getHandle();
+        while(handleElement>0)//risalgo l'albero
+        {
+            if(Double.compare(heap.get(handleElement).getPriority(),heap.get(getParent(handleElement)).getPriority())<0)//se handle element è minore del suo parent handle element, li scambio
+                swap(handleElement,getParent(handleElement));
+            handleElement=getParent(handleElement);
+        }
     }
 
     /**
@@ -123,6 +129,7 @@ public class TernaryHeapMinPriorityQueue {
         swap(0,heap.size()-1);//scambio il primo elemento(root=0=minumum()) con ultimo infondo
         heap.remove(size()-1);//cancello l'ultimo
         heapify(0);//e chiamo heapify() sull'ultimo, dato che deve essere rioprdinato
+        min.setHandle(0);
         return min;
     }
 
@@ -162,10 +169,10 @@ public class TernaryHeapMinPriorityQueue {
      */
     public void decreasePriority(PriorityQueueElement element,
             double newPriority) {
+        if(element==null ||element.getHandle() < 0 || element.getHandle() > size())
+            throw new NoSuchElementException();
         if(element.getPriority()<newPriority)
             throw new IllegalArgumentException();
-        if(heap.get(element.getHandle())==null)
-            throw new NoSuchElementException();
 
         element.setPriority(newPriority);
         heapify(getParent(element.getHandle()));
@@ -178,15 +185,15 @@ public class TernaryHeapMinPriorityQueue {
         int center = centralIndex(h);
 
         // se elemento di left index è minore del root
-        if (left < heap.size() && heap.get(left).getPriority() < (heap.get(min).getPriority()))
+        if (left < heap.size() && Double.compare(heap.get(left).getPriority(),(heap.get(min).getPriority()))<0)
             min = leftIndex(h);//lo metto su min
 
 
-        if (right < heap.size() && heap.get(right).getPriority() < (heap.get(min).getPriority()))
+        if (right < heap.size() && Double.compare(heap.get(right).getPriority(),(heap.get(min).getPriority()))<0)
             min = rightIndex(h);//metto su min
 
 
-        if (center < heap.size() && heap.get(center).getPriority() < heap.get(min).getPriority())
+        if (center < heap.size() && Double.compare(heap.get(center).getPriority(),(heap.get(min).getPriority()))<0)
             min = centralIndex(h);
 
 
