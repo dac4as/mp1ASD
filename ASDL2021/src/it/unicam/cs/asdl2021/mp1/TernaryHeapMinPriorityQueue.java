@@ -115,6 +115,11 @@ public class TernaryHeapMinPriorityQueue {
         if(isEmpty())
             throw new NoSuchElementException();
         PriorityQueueElement min=minimum();//salvo il nodo da restituire
+        if(heap.size()==1)
+        {
+            heap.clear();
+            return min;
+        }
         swap(0,heap.size()-1);//scambio il primo elemento(root=0=minumum()) con ultimo infondo
         heap.remove(size()-1);//cancello l'ultimo
         heapify(0);//e chiamo heapify() sull'ultimo, dato che deve essere rioprdinato
@@ -180,8 +185,10 @@ public class TernaryHeapMinPriorityQueue {
         if (right < heap.size() && heap.get(right).getPriority() < (heap.get(min).getPriority()))
             min = rightIndex(h);//metto su min
 
+
         if (center < heap.size() && heap.get(center).getPriority() < heap.get(min).getPriority())
             min = centralIndex(h);
+
 
         // se min è diverso da root
         if (min != h) {

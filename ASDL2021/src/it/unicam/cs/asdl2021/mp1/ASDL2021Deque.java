@@ -440,14 +440,19 @@ public class ASDL2021Deque<E> implements Deque<E> {
         }
 
         public boolean hasNext() {
-            if (isEmpty()) return false;
-            return lastReturned.next!=null;
+            if(isEmpty())
+                return false;
+            if(lastReturned.next!=null)
+                return true;
+            else throw new NullPointerException();
         }
 
         public E next() {
-            if(hasNext())
-                return lastReturned.next.item;
-            else throw new NoSuchElementException();
+            if(!hasNext())
+                throw new NoSuchElementException();
+            if(numeroModificheAtteso!=nMod)
+                throw new ConcurrentModificationException();
+            return lastReturned.next.item;
         }
     }
 
@@ -474,18 +479,22 @@ public class ASDL2021Deque<E> implements Deque<E> {
         }
 
         public boolean hasNext() {
-            return lastReturned.prev!=null;
+            if(isEmpty())
+                return false;
+            if(lastReturned.next!=null)
+                return true;
+            else throw new NullPointerException();
         }
 
         public E next() {
-            if(hasNext())
-                return lastReturned.prev.item;
-            else throw new NoSuchElementException();
+            if(!hasNext())
+               throw new NoSuchElementException();
+            if(numeroModificheAtteso!=nMod)
+                throw new ConcurrentModificationException();
+            return lastReturned.prev.item;
         }
 
     }
-
-    // TODO implement: possibly add private methods for implementation purposes
 
     /*
      * This method is only for JUnit testing purposes.
